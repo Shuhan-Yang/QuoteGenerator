@@ -1,34 +1,42 @@
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
-
-const axios = require('axios');
-
-const options = {
-  method: 'GET',
-  url: 'https://theysaidso.p.rapidapi.com/quote/random',
-  params: {language: 'en'},
-  headers: {
-    'X-RapidAPI-Key': '3ca1b563b8msh43c46189f1f12d8p1f1b06jsn364dd92be195',
-    'X-RapidAPI-Host': 'theysaidso.p.rapidapi.com'
-  }
-};
-
-try {
-	const response = await axios.request(options);
-	console.log(response.data);
-} catch (error) {
-	console.error(error);
-}
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
+import DisplayImage from './DisplayImage';
 
 export default function App() {
+  // define variables, and store quote, similar with last assignment 
+  // manage array of fetched quote, can be updated
+  const [quotes, setQuotes] = useState([]);
+  // manage displayed quote, such as text and author
+  const [displayQuote, setDisplayQuote] = useState({ text: '', author: '' });
+// fetch data from api
+  useEffect(() => {
+    // Fetch data from the API and set it in the state
+    fetch('https://type.fit/api/quotes')
+      .then((response) => response.json())
+      .then((data) => setQuotes(data))
+      .catch((error) => console.error(error));
+  }, []);
+// randomly select quote, resource from https://stackoverflow.com/questions/70169050/how-to-get-random-data-from-api
+  useEffect(() => {
+    // Randomly select a quote 
+    if (quotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setDisplayQuote(quotes[randomIndex]);
+    }
+  }, [quotes]);
+
   return (
     <View style={styles.container}>
-    <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
-        Welcome to Quote Generator
-      </Text>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text style={{fontSize: 26, fontWeight: 'bold', marginTop: 100,color: "blue"}}>Welcome to Quote Generator</Text>
       <StatusBar style="auto" />
+      {/* Display quote */}
+      <Text style={{fontSize: 20, marginTop: 60, marginLeft:20, marginRight:20, justifyContent: "center"}}>{displayQuote.text}</Text>
+      <Text style={{fontSize: 16, fontStyle: 'italic', marginTop: 10}}>-- {displayQuote.author}</Text>
+      <DisplayImage />
+      <View style={styles.button}>
+        <Button title="Save" />
+      </View>
     </View>
   );
 }
@@ -40,4 +48,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  button: {
+    justifyContent: "center",
+    marginBottom: 300,
+  }
 });
