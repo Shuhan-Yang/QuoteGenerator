@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import DisplayImage from './DisplayImage';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,9 +9,17 @@ import RegenerateButton from './RegenerateButton';
 
 // navigation stack
 const Stack = createStackNavigator();
+
 // pass props
-function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote }) {
+function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote, imageOption }) {
   const navigation = useNavigation(); 
+  // initialize imageindex to display image
+  const [imageIndex, setImageIndex] = useState(0);
+  // alert message 
+  const saveAlert = () => {
+    Alert.alert('Saved','You saved the quote', [{ text: 'OK' }]);
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -30,13 +38,13 @@ function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote }) {
       <Text style={{ fontSize: 16, fontStyle: 'italic', marginTop: 10 }}>
         -- {displayQuote.author}
       </Text>
-      <DisplayImage />
+      <DisplayImage imageOption={imageOption} imageIndex={imageIndex} />
       <View style={styles.button}>
-        <Button title="Save" />
+        <Button title="Save" onPress={saveAlert} />
       </View>
       <View style={styles.generate}>
       {/* render in component for regenerating quote */}
-      <RegenerateButton setQuotes={setQuotes} setDisplayQuote={setDisplayQuote} quotes={quotes} />
+      <RegenerateButton setQuotes={setQuotes} setDisplayQuote={setDisplayQuote} quotes={quotes} imageIndex={imageIndex} setImageIndex={setImageIndex} imageOption={imageOption} />
 
       </View>
     </View>
@@ -52,9 +60,23 @@ function MenuScreen() {
 }
 
 export default function App() {
+  // define imageoption array, use require to allowed to use local resources 
+  const imageOption = [
+    require('./images/smile.jpg'),
+    require('./images/smile2.jpg'),
+    require('./images/smile3.jpg'),
+    require('./images/smile4.jpg'),
+    require('./images/smile5.jpg'),
+    require('./images/smile6.jpg'),
+    require('./images/smile7.jpg'),
+    require('./images/smile8.jpg'),
+    require('./images/smile9.jpg'),
+    require('./images/smile10.jpg'),
+  ];
    // define variables, and store quote, similar with last assignment 
   // manage array of fetched quote, can be updated
   const [quotes, setQuotes] = useState([]);
+  const [imageIndex, setImageIndex] = useState(0);
   // manage displayed quote, such as text and author
   const [displayQuote, setDisplayQuote] = useState({ text: '', author: '' });
 // fetch data from api
@@ -74,6 +96,16 @@ export default function App() {
     }
   }, [quotes]);
 
+  const handleRegenerate = () => {
+    regenerateRandomQuote();
+    regenerateRandomImage();
+  };
+
+  const regenerateRandomImage = () => {
+    const randomIndex = Math.floor(Math.random() * imageOption.length);
+    setImageIndex(randomIndex); // Update imageIndex with a new random index
+  };
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -83,6 +115,7 @@ export default function App() {
             quotes={quotes}
             setQuotes={setQuotes}
             setDisplayQuote={setDisplayQuote}
+            imageOption={imageOption}
           />}
         </Stack.Screen>
         <Stack.Screen name="Menu" component={MenuScreen} />
