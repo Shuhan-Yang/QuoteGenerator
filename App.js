@@ -5,6 +5,7 @@ import DisplayImage from './DisplayImage';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import RegenerateButton from './RegenerateButton';
+
 // import required modules and components
 
 // navigation stack
@@ -15,8 +16,15 @@ function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote, imageOpt
   const navigation = useNavigation(); 
   // initialize imageindex to display image
   const [imageIndex, setImageIndex] = useState(0);
+  // initialize savedQuotes array to store saved quotes
+  const [savedQuotes, setSavedQuotes] = useState([]);
+
   // alert message 
   const saveAlert = () => {
+    // current display quote
+    const savedQuote = displayQuote;
+    // update the state by create new array, ...spread operator https://www.w3schools.com/react/react_es6_spread.asp
+    setSavedQuotes((usedSavedQuotes) => [...usedSavedQuotes, savedQuote]);
     Alert.alert('Saved','You saved the quote', [{ text: 'OK' }]);
   };
   
@@ -25,7 +33,8 @@ function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote, imageOpt
     <View style={styles.container}>
     <View style={styles.savedquote}>
     {/* navigate to menu screen */}
-      <Button title="Saved" onPress={() => navigation.navigate('Menu')} />
+    {/* pass savedquotes as parameter, display the data */}
+      <Button title="Saved" onPress={() => navigation.navigate('Menu', { savedQuotes })} />
       </View>
       <Text style={{ fontSize: 26, fontWeight: 'bold', marginTop: 10, color: "blue" }}>
         Welcome to Quote Generator
@@ -51,10 +60,19 @@ function HomeScreen({ displayQuote, quotes, setQuotes, setDisplayQuote, imageOpt
   );
 }
 
-function MenuScreen() {
+function MenuScreen({ route }) {
+  // extract data from route.params, part of the resource is from https://reactnavigation.org/docs/3.x/params/
+  const { savedQuotes } = route.params;
   return (
     <View style={styles.quote}>
-      <Text>Saved Quote</Text>
+ 
+      <Text style = {{fontSize: 25, color: 'blue', alignItems: 'center'}} >Saved Quote</Text>
+     {/* map through savedQuotes array and display the quote and author */}
+      {savedQuotes.map((quote, index) => (
+        <View key={index}>
+          <Text style = {{fontSize: 18, padding: 5, marginTop: 6}}>{quote.text}</Text>
+          <Text style = {{fontStyle: 'italic'}}>-- {quote.author}</Text>
+        </View> ))}
     </View>
   );
 }
@@ -137,11 +155,13 @@ const styles = StyleSheet.create({
   },
   savedquote: {
     marginLeft: 350,
+    
   },
   quote: {
     marginLeft: 5,
   },
   generate: {
     marginBottom: 80,
-  }
+  },
+
 });
