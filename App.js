@@ -96,10 +96,10 @@ export default function App() {
     }
   }, [quotes]);
 
-  const handleRegenerate = () => {
-    regenerateRandomQuote();
-    regenerateRandomImage();
-  };
+  // const handleRegenerate = () => {
+  //   regenerateRandomQuote();
+  //   regenerateRandomImage();
+  // };
 
   const regenerateRandomImage = () => {
     const randomIndex = Math.floor(Math.random() * imageOption.length);
